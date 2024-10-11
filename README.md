@@ -1,2 +1,4 @@
 # shared-pipelines
-Shared Tekton Pipelines and Tasks
+
+AppSRE [shared Tekton Pipelines and Tasks](https://tekton.dev/docs/pipelines/pipelineruns/#remote-pipelines).
+
