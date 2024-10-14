@@ -32,15 +32,14 @@ spec:
   - name: path-context
     value: .
   pipelineRef:
-    name: multi-arch-build-pipeline
-    #resolver: git
-    #params:
-    #- name: url
-    #  value: https://github.com/app-sre/shared-pipelines
-    #- name: revision
-    #  value: main
-    #- name: pathInRepo
-    #  value: pipelines/multi-arch-build-pipeline.yaml
+    resolver: git
+    params:
+    - name: url
+      value: https://github.com/app-sre/shared-pipelines
+    - name: revision
+      value: main
+    - name: pathInRepo
+      value: pipelines/multi-arch-build-pipeline.yaml
   taskRunTemplate: {}
   workspaces:
   - name: workspace
