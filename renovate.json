@@ -1,7 +1,14 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>konflux-ci/mintmaker//config/renovate/renovate.json",
+    "config:best-practices"
+  ],
   "tekton": {
     "includePaths": [
       "pipelines/**"
     ]
-  }
+  },
+  "dependencyDashboard": true,
+  "semanticCommits": "enabled"
 }

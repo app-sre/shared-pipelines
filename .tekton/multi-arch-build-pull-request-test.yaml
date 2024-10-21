@@ -15,7 +15,7 @@ metadata:
     appstudio.openshift.io/application: shared-pipelines-main
     appstudio.openshift.io/component: shared-pipelines-main
     pipelines.appstudio.openshift.io/type: build
-  name: shared-pipelines-main-on-pull-request
+  name: multi-arch-build-pull-request-test
   namespace: app-sre-tenant
 spec:
   params:
