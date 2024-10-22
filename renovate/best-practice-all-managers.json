@@ -37,5 +37,7 @@
     "tflint-plugin",
     "pip_requirements",
     "pip_setup"
-  ]
+  ],
+  "dependencyDashboard": true,
+  "semanticCommits": "enabled"
 }
