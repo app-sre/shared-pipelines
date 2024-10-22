@@ -38,6 +38,14 @@
     "pip_requirements",
     "pip_setup"
   ],
+  "pip_requirements": {
+    "additionalBranchPrefix": "{{baseBranch}}/",
+    "branchPrefix": "konflux/mintmaker/"
+  },
+  "pip_setup": {
+    "additionalBranchPrefix": "{{baseBranch}}/",
+    "branchPrefix": "konflux/mintmaker/"
+  },
   "dependencyDashboard": true,
   "semanticCommits": "enabled"
 }
