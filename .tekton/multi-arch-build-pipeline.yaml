@@ -28,6 +28,75 @@ spec:
         - name: kind
           value: task
         resolver: bundles
+    - name: clone-repository-for-version-check
+      params:
+      - name: url
+        value: $(params.git-url)
+      - name: revision
+        value: $(params.revision)
+      - name: depth
+        value: 1
+      - name: fetchTags
+        value: "true"
+      runAfter:
+      - init
+      taskRef:
+        params:
+        - name: name
+          value: git-clone
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-git-clone:0.1@sha256:2cccdf8729ad4d5adf65e8b66464f8efa1e1c87ba16d343b4a6c621a2a40f7e1
+        - name: kind
+          value: task
+        resolver: bundles
+      when:
+       - input: $(tasks.init.results.build)
+         operator: in
+         values:
+         - "true"
+       - input: $(params.fail-if-no-version-diff)
+         operator: in
+         values:
+         - "true" 
+         - "True" 
+      workspaces:
+      - name: output
+        workspace: workspace
+      - name: basic-auth
+        workspace: git-auth
+    - name: enforce-version-diff
+      params:
+      - name: fail-if-no-version-diff
+        value: $(params.fail-if-no-version-diff)
+      - name: DOCKERFILE
+        value: $(params.dockerfile)
+      runAfter:
+      - clone-repository-for-version-check
+      taskSpec:
+        steps:
+        # https://github.com/konflux-ci/build-definitions/blob/main/task/git-clone/0.1/git-clone.yaml
+        # Workaround until https://issues.redhat.com/browse/RELEASE-993 is in place
+        - image: quay.io/konflux-ci/git-clone@sha256:4e53ebd9242f05ca55bfc8d58b3363d8b9d9bc3ab439d9ab76cdbdf5b1fd42d9
+          name: enforce-version-changed
+          script: |-
+            #!/usr/bin/env sh
+            set -eu
+            set -o verbose 
+
+            export WORKSPACE=$(workspaces.source.path)/source
+            git config --global --add safe.directory ${WORKSPACE}
+            export MAIN_BRANCH=$(git -C ${WORKSPACE} branch -r -l origin/master origin/main | awk '{$1=$1};1')
+            echo "Ensure we have a diff for konflux.additional-tags. Did you bump konflux.additional-tags label $(params.DOCKERFILE)?"
+            git -C ${WORKSPACE} diff ${MAIN_BRANCH}:$(params.DOCKERFILE) $(params.DOCKERFILE) | grep "LABEL konflux.additional-tags="
+      workspaces:
+      - name: source
+        workspace: workspace
+      when:
+       - input: $(params.fail-if-no-version-diff)
+         operator: in
+         values:
+         - "true" 
+         - "True"
     - name: clone-repository
       params:
       - name: url
@@ -39,7 +108,7 @@ spec:
       - name: ociArtifactExpiresAfter
         value: $(params.image-expires-after)
       runAfter:
-      - init
+      - enforce-version-diff
       taskRef:
         params:
         - name: name
@@ -83,6 +152,7 @@ spec:
         workspace: git-auth
       - name: netrc
         workspace: netrc
+    
     - matrix:
         params:
         - name: PLATFORM
@@ -407,6 +477,12 @@ spec:
     - default: ""
       description: Specify which stage to build in a multi-stage Dockerfile.
       name: target-stage
+      type: string
+    - default: "false"
+      description: Specify whether the pipeline should fail if no change to konflux.additional-tags was detected in the Dockerfile.
+        Enabling this option ensures that we do not override an existing tag. Note, this will always fail if you add it to main branch
+        push pipeline runs. This is dedicated for pipeline runs of pull request push events.
+      name: fail-if-no-version-diff
       type: string
     workspaces:
     - name: git-auth
