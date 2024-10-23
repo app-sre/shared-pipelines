@@ -28,14 +28,8 @@ spec:
   - name: path-context
     value: .
   pipelineRef:
-    resolver: git
-    params:
-    - name: url
-      value: https://github.com/app-sre/shared-pipelines
-    - name: revision
-      value: main
-    - name: pathInRepo
-      value: pipelines/multi-arch-build-pipeline.yaml
+    # Note, we do not use git resolver here because PR checks would use main branch and not test the changes
+    name: multi-arch-build-pipeline
   taskRunTemplate: {}
   workspaces:
   - name: workspace
