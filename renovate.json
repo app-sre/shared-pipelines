@@ -2,10 +2,5 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>app-sre/shared-pipelines//renovate/default.json"
-  ],
-  "tekton": {
-    "includePaths": [
-      "pipelines/**"
-    ]
-  }
+  ]
 }
