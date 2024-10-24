@@ -32,8 +32,14 @@ spec:
   - name: path-context
     value: .
   pipelineRef:
-    # Note, we do not use git resolver here because PR checks would use main branch and not test the changes
-    name: multi-arch-build-pipeline
+    resolver: git
+    params:
+    - name: url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: pathInRepo
+      value: pipelines/multi-arch-build-pipeline.yaml
   taskRunTemplate: {}
   workspaces:
   - name: workspace
