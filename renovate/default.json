@@ -49,5 +49,11 @@
     "branchPrefix": "konflux/mintmaker/"
   },
   "dependencyDashboard": true,
-  "semanticCommits": "enabled"
+  "semanticCommits": "enabled",
+  "packageRules": [
+    {
+      "matchPackageNames": ["pytest**"],
+      "groupName": "pytest"
+    }
+  ]
 }
