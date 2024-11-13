@@ -60,5 +60,8 @@
       "matchPackageNames": ["pytest**"],
       "groupName": "pytest"
     }
-  ]
+  ],
+  "lockFileMaintenance": {
+    "enabled": true
+  }
 }
