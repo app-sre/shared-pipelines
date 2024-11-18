@@ -66,6 +66,25 @@
       "datasources": ["docker"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "description": "Automerge updates to Ubi images",
+      "matchPackageNames": [
+        "registry.access.redhat.com/ubi9/ubi-minimal",
+        "registry.access.redhat.com/ubi9/ubi",
+        "registry.access.redhat.com/ubi8/ubi-minimal",
+        "registry.access.redhat.com/ubi8/ubi"
+      ],
+      "datasources": ["docker"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
+      "description": "Automerge updates to ruff",
+      "matchPackageNames": ["ruff"],
+      "datasources": ["python"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
     }
   ],
   "lockFileMaintenance": {
