@@ -417,7 +417,8 @@ spec:
       type: string
     - default:
       - linux/x86_64
-      - linux/arm64
+      # Disable arm builds until they are in-cluster or much faster!
+      # - linux/arm64
       description: List of platforms to build the container images on. The available
         set of values is determined by the configuration of the multi-platform-controller.
       name: build-platforms
