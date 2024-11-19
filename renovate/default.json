@@ -82,12 +82,13 @@
     {
       "description": "Automerge updates to ruff",
       "matchPackageNames": ["ruff"],
-      "datasources": ["python"],
+      "datasources": ["pypi"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
     }
   ],
   "lockFileMaintenance": {
-    "enabled": true
+    "enabled": true,
+    "automerge": true
   }
 }
