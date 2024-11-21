@@ -1,21 +1,19 @@
----
 apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   annotations:
     build.appstudio.openshift.io/repo: https://github.com/app-sre/shared-pipelines?rev={{revision}}
     build.appstudio.redhat.com/commit_sha: '{{revision}}'
-    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
-    pipelinesascode.tekton.dev/max-keep-runs: "10"
-    pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
+    pipelinesascode.tekton.dev/max-keep-runs: "20"
+    pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
       == "main"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: shared-pipelines-main
-    appstudio.openshift.io/component: multi-arch-build-pipeline-main
+    appstudio.openshift.io/component: single-arch-build-pipeline-main
     pipelines.appstudio.openshift.io/type: build
-  name: multi-arch-build-pipeline-pull-request
+  name: single-arch-build-pipeline-main-push
   namespace: app-sre-tenant
 spec:
   params:
@@ -24,24 +22,22 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/app-sre-tenant/shared-pipelines-main/multi-arch-build-pipeline-main:on-pr-{{revision}}
-  - name: image-expires-after
-    value: 5d
+    value: quay.io/redhat-user-workloads/app-sre-tenant/shared-pipelines-main/single-arch-build-pipeline-main:{{revision}}
   - name: dockerfile
     value: pipeline-tests/Dockerfile
   - name: path-context
     value: .
   - name: target-stage
-    value: test
+    value: prod
   pipelineRef:
     resolver: git
     params:
     - name: url
-      value: '{{source_url}}'
+      value: https://github.com/app-sre/shared-pipelines
     - name: revision
-      value: '{{revision}}'
+      value: main
     - name: pathInRepo
-      value: pipelines/multi-arch-build-pipeline.bak.yaml
+      value: pipelines/multi-arch-build-pipeline.yaml
   taskRunTemplate: {}
   workspaces:
   - name: workspace
