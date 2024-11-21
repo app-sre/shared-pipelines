@@ -31,6 +31,8 @@ spec:
     value: pipeline-tests/Dockerfile
   - name: path-context
     value: .
+  - name: target-stage
+    value: test
   pipelineRef:
     resolver: git
     params:
