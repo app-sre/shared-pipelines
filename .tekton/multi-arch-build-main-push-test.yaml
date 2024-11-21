@@ -11,9 +11,9 @@ metadata:
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: shared-pipelines-main
-    appstudio.openshift.io/component: shared-pipelines-main
+    appstudio.openshift.io/component: multi-arch-build-pipeline-main
     pipelines.appstudio.openshift.io/type: build
-  name: multi-arch-build-main-push-test
+  name: multi-arch-build-pipeline-main-push
   namespace: app-sre-tenant
 spec:
   params:
@@ -22,7 +22,7 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/app-sre-tenant/shared-pipelines-main/shared-pipelines-main:{{revision}}
+    value: quay.io/redhat-user-workloads/app-sre-tenant/shared-pipelines-main/multi-arch-build-pipeline-main:{{revision}}
   - name: dockerfile
     value: pipeline-tests/Dockerfile
   - name: path-context
@@ -37,7 +37,7 @@ spec:
     - name: revision
       value: main
     - name: pathInRepo
-      value: pipelines/multi-arch-build-pipeline.yaml
+      value: pipelines/multi-arch-build-pipeline.bak.yaml
   taskRunTemplate: {}
   workspaces:
   - name: workspace
