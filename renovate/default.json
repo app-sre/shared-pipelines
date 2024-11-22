@@ -6,52 +6,18 @@
     ":automergeDigest",
     "group:allDigest"
   ],
-  "enabledManagers": [
-    "tekton",
-    "dockerfile",
-    "rpm",
-    "custom.regex",
-    "argocd",
-    "crossplane",
-    "fleet",
-    "flux",
-    "helm-requirements",
-    "helm-values",
-    "helmfile",
-    "helmsman",
-    "helmv3",
-    "jsonnet-bundler",
-    "kubernetes",
-    "kustomize",
-    "asdf",
-    "fvm",
-    "git-submodules",
-    "hermit",
-    "homebrew",
-    "nix",
-    "osgi",
-    "pre-commit",
-    "vendir",
-    "terraform",
-    "terraform-version",
-    "terragrunt",
-    "terragrunt-version",
-    "tflint-plugin",
-    "pip_requirements",
-    "pip_setup",
-    "pep621"
-  ],
+  "updateNotScheduled": true,
+  "dockerfile": {
+    "schedule": ["after 5am"]
+  },
   "pip_requirements": {
-    "additionalBranchPrefix": "{{baseBranch}}/",
-    "branchPrefix": "konflux/mintmaker/"
+    "schedule": ["after 5am"]
   },
   "pip_setup": {
-    "additionalBranchPrefix": "{{baseBranch}}/",
-    "branchPrefix": "konflux/mintmaker/"
+    "schedule": ["after 5am"]
   },
   "pep621": {
-    "additionalBranchPrefix": "{{baseBranch}}/",
-    "branchPrefix": "konflux/mintmaker/"
+    "schedule": ["after 5am"]
   },
   "dependencyDashboard": true,
   "semanticCommits": "enabled",
