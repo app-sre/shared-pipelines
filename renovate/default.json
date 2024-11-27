@@ -19,6 +19,9 @@
   "pep621": {
     "schedule": ["after 5am"]
   },
+  "tekton": {
+    "schedule": ["after 5am"]
+  },
   "dependencyDashboard": true,
   "semanticCommits": "enabled",
   "packageRules": [
