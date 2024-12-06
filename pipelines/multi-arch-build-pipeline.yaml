@@ -102,6 +102,10 @@ spec:
     description: Path to a file with build arguments for buildah, see https://www.mankier.com/1/buildah-build#--build-arg-file
     name: build-args-file
     type: string
+  - default: "does-not-exist"
+    description: Name of a secret which will be made available to the build with 'buildah build --secret' at /run/secrets/$ADDITIONAL_SECRET
+    name: additional_secret
+    type: string
   results:
   - description: ""
     name: IMAGE_URL
@@ -210,6 +214,8 @@ spec:
       - $(params.build-args[*])
     - name: BUILD_ARGS_FILE
       value: $(params.build-args-file)
+    - name: ADDITIONAL_SECRET
+      value: $(params.additional_secret)
     runAfter:
     - prefetch-dependencies
     taskRef:
