@@ -175,7 +175,7 @@ spec:
       - name: name
         value: prefetch-dependencies
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1@sha256:20f76c14b756c745e315334dd0437cf4f6004763e2d23b27cf0f8e896fe2207c
+        value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.1@sha256:22a3c3e9639eb3540abae8d13aea11f5a55d83eb7efbf19ae596656cabe6bdc8
       - name: kind
         value: task
       resolver: bundles
@@ -223,7 +223,7 @@ spec:
       - name: name
         value: buildah
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-buildah:0.3@sha256:9362d1e20b74c946c6c787ee2c82f202d7d131f06fccf55436b70feed295a757
+        value: quay.io/konflux-ci/tekton-catalog/task-buildah:0.3@sha256:02b62e76e79f8686045058a44f9f2c9b83b273b2664aa2b26ad3df333450df61
       - name: kind
         value: task
       resolver: bundles
@@ -255,7 +255,7 @@ spec:
       - name: name
         value: build-image-index
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:09344e6bda708f48ef759bbe84bce99515549f4cfdcbe89e417f695c19463260
+        value: quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.1@sha256:285ab4f370f0a264b5053ad679cf47e710aa5ce9d942c63ed9299c0e5dbf6add
       - name: kind
         value: task
       resolver: bundles
@@ -326,7 +326,7 @@ spec:
       - name: name
         value: clair-scan
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.2@sha256:4584647138af3efe5f1c523d0f56103c3b9647325634d17f04e2198a2c3c0c26
+        value: quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.2@sha256:f636f2cbe91d9d4d9685a38c8bc680a36e17f568ec0e60a93da82d1284b488c5
       - name: kind
         value: task
       resolver: bundles
@@ -393,7 +393,7 @@ spec:
       - name: name
         value: clamav-scan
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.2@sha256:525ad6081d7d38082db057482bd9ecc59c38954656b1a4e33a28de9c19e71006
+        value: quay.io/konflux-ci/tekton-catalog/task-clamav-scan:0.2@sha256:0db068e8a59612472a2483f5113893d0c5c9102e9ad7647d9a4789360e5bc2dc
       - name: kind
         value: task
       resolver: bundles
