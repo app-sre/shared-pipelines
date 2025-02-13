@@ -175,7 +175,7 @@ spec:
       - name: name
         value: prefetch-dependencies
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.2@sha256:077275cdae63f3a0ea5812126df4efa17cc413ce4cd95bec8c436cfea8c6c7e9
+        value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies:0.2@sha256:fb126d78a71fa4cef9046d2563832c91ec73e0d1a7c5811b85e9d28132b7c076
       - name: kind
         value: task
       resolver: bundles
