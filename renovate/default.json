@@ -57,6 +57,12 @@
       "automerge": true
     }
   ],
+  "pin": {
+    "automerge": true
+  },
+  "pinDigest": {
+    "automerge": true
+  },
   "lockFileMaintenance": {
     "enabled": true,
     "automerge": true
