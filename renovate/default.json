@@ -55,6 +55,10 @@
       "datasources": ["pypi"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "matchPackageNames": ["hashicorp/terraform", "terraform"],
+      "enabled": false
     }
   ],
   "pin": {
