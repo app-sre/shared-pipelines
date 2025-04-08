@@ -4,8 +4,7 @@
     "github>konflux-ci/mintmaker//config/renovate/renovate.json",
     "config:best-practices",
     ":automergeDigest",
-    "group:allDigest",
-    "group:allNonMajor"
+    "group:allDigest"
   ],
   "updateNotScheduled": true,
   "dockerfile": {
@@ -26,6 +25,17 @@
   "dependencyDashboard": true,
   "semanticCommits": "enabled",
   "packageRules": [
+    {
+      "groupName": "all non-major {{manager}} dependencies",
+      "groupSlug": "all-minor-patch-{{manager}}",
+      "matchPackageNames": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ]
+    },
     {
       "matchPackageNames": ["pytest**"],
       "groupName": "pytest"
