@@ -26,6 +26,14 @@
   "semanticCommits": "enabled",
   "packageRules": [
     {
+      "description": "Red Hat Versioning docker images",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "quay.io/redhat-services-prod/app-sre-tenant/er-*/**"
+      ],
+      "versioning": "redhat"
+    },
+    {
       "groupName": "all non-major {{manager}} dependencies",
       "groupSlug": "all-minor-patch-{{manager}}",
       "matchPackageNames": [
@@ -50,10 +58,7 @@
     {
       "description": "Automerge updates to Ubi images",
       "matchPackageNames": [
-        "registry.access.redhat.com/ubi9/ubi-minimal",
-        "registry.access.redhat.com/ubi9/ubi",
-        "registry.access.redhat.com/ubi8/ubi-minimal",
-        "registry.access.redhat.com/ubi8/ubi"
+        "registry.access.redhat.com/ubi*{/,}**"
       ],
       "datasources": ["docker"],
       "matchUpdateTypes": ["minor", "patch"],
