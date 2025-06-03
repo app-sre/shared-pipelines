@@ -72,6 +72,13 @@
       "automerge": true
     },
     {
+      "description": "Disable automatic updates for Python major/minor versions",
+      "matchDatasources": ["python-version"],
+      "matchPackageNames": ["python"],
+      "matchUpdateTypes": ["major", "minor"],
+      "enabled": false
+    },
+    {
       "matchPackageNames": ["hashicorp/terraform", "terraform"],
       "enabled": false
     }
