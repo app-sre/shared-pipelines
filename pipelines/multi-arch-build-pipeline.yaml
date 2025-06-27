@@ -102,6 +102,11 @@ spec:
     description: Name of a secret which will be made available to the build with 'buildah build --secret' at /run/secrets/$ADDITIONAL_SECRET
     name: additional_secret
     type: string
+  - default: "false"
+    # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
+    description: Fetch all tags for the repo.
+    name: fetchTags
+    type: string
   results:
   - description: ""
     name: IMAGE_URL
@@ -139,6 +144,9 @@ spec:
       value: $(params.git-url)
     - name: revision
       value: $(params.revision)
+    # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
+    - name: fetchTags
+      value: $(params.fetchTags)
     runAfter:
     - init
     taskRef:
