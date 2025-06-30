@@ -25,6 +25,9 @@ spec:
       resolver: bundles
   - name: clone-repository
     params:
+    # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone-oci-ta/0.1
+    - name: fetchTags
+      value: $(params.fetchTags)
     - name: url
       value: $(params.git-url)
     - name: revision
@@ -414,6 +417,11 @@ spec:
       values:
       - "false"
   params:
+  - default: "false"
+    # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone-oci-ta/0.1
+    description: Fetch all tags for the repo.
+    name: fetchTags
+    type: string
   - description: Source Repository URL
     name: git-url
     type: string
