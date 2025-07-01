@@ -75,6 +75,8 @@ spec:
         value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.2@sha256:5e15408f997557153b13d492aeccb51c01923bfbe4fbdf6f1e8695ce1b82f826
       - name: kind
         value: task
+      - name: depth
+        value: $(params.cloneDepth)
       resolver: bundles
     workspaces:
     - name: git-basic-auth
@@ -421,6 +423,11 @@ spec:
     # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone-oci-ta/0.1
     description: Fetch all tags for the repo.
     name: fetchTags
+    type: string
+  - default: "1"
+  # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
+    description: Perform a shallow clone, fetching only the most recent N commits.
+    name: cloneDepth
     type: string
   - description: Source Repository URL
     name: git-url

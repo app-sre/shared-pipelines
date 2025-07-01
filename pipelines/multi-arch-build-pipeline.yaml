@@ -107,6 +107,11 @@ spec:
     description: Fetch all tags for the repo.
     name: fetchTags
     type: string
+  - default: "1"
+  # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
+    description: Perform a shallow clone, fetching only the most recent N commits.
+    name: cloneDepth
+    type: string
   results:
   - description: ""
     name: IMAGE_URL
@@ -147,6 +152,8 @@ spec:
     # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
     - name: fetchTags
       value: $(params.fetchTags)
+    - name: depth
+      value: $(params.cloneDepth)
     runAfter:
     - init
     taskRef:
