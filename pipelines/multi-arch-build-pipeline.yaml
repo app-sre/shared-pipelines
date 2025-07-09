@@ -1,8 +1,9 @@
 # Single arch build (amd64)
+# Note, that we keep the multi-arch filename because we dont want to change refs in all repos
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: multi-arch-build-pipeline
+  name: single-arch-build-pipeline
 spec:
   finally:
   - name: show-sbom
