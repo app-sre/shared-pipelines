@@ -45,10 +45,6 @@
       ]
     },
     {
-      "matchPackageNames": ["pytest**"],
-      "groupName": "pytest"
-    },
-    {
       "description": "Automerge updates to uv",
       "matchPackageNames": ["ghcr.io/astral-sh/uv"],
       "datasources": ["docker"],
