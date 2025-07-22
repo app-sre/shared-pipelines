@@ -33,7 +33,7 @@ spec:
     value: .
   - name: target-stage
     value: test
-  - name: ephemeral-namespace-test-script
+  - name: ephemeral-namespace-run-script
     value: pipeline-tests/ephemeral-namespace-test.sh
   pipelineRef:
     resolver: git
