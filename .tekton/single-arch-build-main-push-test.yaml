@@ -29,6 +29,8 @@ spec:
     value: .
   - name: target-stage
     value: prod
+  - name: ephemeral-namespace-run-script
+    value: pipeline-tests/ephemeral-namespace-test.sh
   pipelineRef:
     resolver: git
     params:

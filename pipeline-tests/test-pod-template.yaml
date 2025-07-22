@@ -1,0 +1,27 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: test-pod-template
+  annotations:
+    description: "Template for deploying a test pod with the built image"
+parameters:
+- name: IMAGE_URL
+  description: "The container image URL to deploy"
+  required: true
+- name: POD_NAME
+  description: "Name of the pod"
+  value: "test-app"
+  required: true
+objects:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    name: ${POD_NAME}
+    labels:
+      app: ${POD_NAME}
+      env: pipeline-test
+  spec:
+    restartPolicy: Never
+    containers:
+    - name: app
+      image: ${IMAGE_URL}

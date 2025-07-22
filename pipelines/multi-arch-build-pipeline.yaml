@@ -113,6 +113,10 @@ spec:
     description: Perform a shallow clone, fetching only the most recent N commits.
     name: cloneDepth
     type: string
+  - default: ""
+    description: Script to run in ephemeral namespace. If empty, ephemeral namespace tasks are skipped.
+    name: ephemeral-namespace-run-script
+    type: string
   results:
   - description: ""
     name: IMAGE_URL
@@ -529,6 +533,86 @@ spec:
       operator: in
       values:
       - "false"
+  - name: deploy-ephemeral-namespace
+    runAfter:
+    - init
+    taskRef:
+      resolver: git
+      params:
+        - name: url
+          value: https://github.com/konflux-ci/build-definitions.git
+        - name: revision
+          value: main
+        - name: pathInRepo
+          value: task/eaas-provision-space/0.1/eaas-provision-space.yaml
+    params:
+      - name: ownerName
+        value: $(context.pipelineRun.name)
+      - name: ownerUid
+        value: $(context.pipelineRun.uid)
+    when:
+    - input: $(params.skip-checks)
+      operator: in
+      values:
+      - "false"
+    - input: $(params.ephemeral-namespace-run-script)
+      operator: notin
+      values:
+      - ""
+  - name: run-in-ephemeral-namespace
+    workspaces:
+    - name: source
+      workspace: workspace
+    runAfter:
+      - deploy-ephemeral-namespace
+      - build-image-index
+    params:
+    - name: SCRIPT_PATH
+      value: $(params.ephemeral-namespace-run-script)
+    - name: IMAGE_URL
+      value: $(tasks.build-image-index.results.IMAGE_URL)
+    - name: IMAGE_DIGEST
+      value: $(tasks.build-image-index.results.IMAGE_DIGEST)
+    - name: SOURCE_CODE_DIR
+      value: source
+    taskSpec:
+      steps:
+      - name: deploy-app
+        image: registry.redhat.io/openshift4/ose-cli:latest
+        workingDir: $(workspaces.source.path)/source
+        env:
+        - name: KUBECONFIG_VALUE
+          valueFrom:
+            secretKeyRef:
+              name: "$(tasks.deploy-ephemeral-namespace.results.secretRef)"
+              key: kubeconfig
+        - name: SCRIPT_PATH
+          value: $(params.ephemeral-namespace-run-script)
+        - name: IMAGE_URL
+          value: $(tasks.build-image-index.results.IMAGE_URL)
+        - name: IMAGE_DIGEST
+          value: $(tasks.build-image-index.results.IMAGE_DIGEST)
+        script: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          # Expose KUBECONFIG for test namespace
+          cat <<< "$KUBECONFIG_VALUE" > /tmp/cfg
+          export KUBECONFIG=/tmp/cfg
+
+          echo "Running script ${SCRIPT_PATH}"
+          chmod +x ./${SCRIPT_PATH}
+          ./${SCRIPT_PATH}
+
+    when:
+    - input: $(params.skip-checks)
+      operator: in
+      values:
+      - "false"
+    - input: $(params.ephemeral-namespace-run-script)
+      operator: notin
+      values:
+      - ""
   workspaces:
   - name: workspace
   - name: git-auth
