@@ -104,18 +104,23 @@ spec:
     name: additional_secret
     type: string
   - default: "false"
-      # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
+    # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
     description: Fetch all tags for the repo.
     name: fetchTags
     type: string
   - default: "1"
-      # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
+    # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
     description: Perform a shallow clone, fetching only the most recent N commits.
     name: cloneDepth
     type: string
   - default: ""
     description: Script to run in ephemeral namespace. If empty, ephemeral namespace tasks are skipped.
     name: ephemeral-namespace-run-script
+    type: string
+  # https://catalog.redhat.com/software/containers/openshift4/ose-cli/5cd9ba3f5a13467289f4d51d/history?architecture=amd64
+  - default: "v4.15"
+    description: Tag of the OpenShift CLI from registry.redhat.io/openshift4/ose-cli to use for ephemeral namespace tasks.
+    name: ephemeral-namespace-oc-cli-version
     type: string
   results:
   - description: ""
@@ -573,12 +578,10 @@ spec:
       value: $(tasks.build-image-index.results.IMAGE_URL)
     - name: IMAGE_DIGEST
       value: $(tasks.build-image-index.results.IMAGE_DIGEST)
-    - name: SOURCE_CODE_DIR
-      value: source
     taskSpec:
       steps:
-      - name: deploy-app
-        image: registry.redhat.io/openshift4/ose-cli:latest
+      - name: run-script
+        image: registry.redhat.io/openshift4/ose-cli:$(params.ephemeral-namespace-oc-cli-version)
         workingDir: $(workspaces.source.path)/source
         env:
         - name: KUBECONFIG_VALUE
