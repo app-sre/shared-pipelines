@@ -562,7 +562,8 @@ spec:
           value: https://github.com/konflux-ci/build-definitions.git
         - name: revision
           # Note, we must use a concrete commit ID or enterprise contract will fail
-          value: 116f1d3c86b8ab188e5a5aaee80f01b79398bca7
+          # The violation log will show you the allowed/trusted commit ref to use
+          value: 05686269c33b8f1aac66252c0c7b859b42dca2ed
         - name: pathInRepo
           value: task/eaas-provision-space/0.1/eaas-provision-space.yaml
     params:
