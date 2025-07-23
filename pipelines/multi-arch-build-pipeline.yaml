@@ -561,7 +561,8 @@ spec:
         - name: url
           value: https://github.com/konflux-ci/build-definitions.git
         - name: revision
-          value: main
+          # Note, we must use a concrete commit ID or enterprise contract will fail
+          value: 116f1d3c86b8ab188e5a5aaee80f01b79398bca7
         - name: pathInRepo
           value: task/eaas-provision-space/0.1/eaas-provision-space.yaml
     params:
