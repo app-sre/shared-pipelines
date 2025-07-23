@@ -31,6 +31,8 @@ spec:
     value: prod
   - name: ephemeral-namespace-run-script
     value: pipeline-tests/ephemeral-namespace-test.sh
+  - name: goss-container-structure-test-file
+    value: pipeline-tests/goss.yaml
   pipelineRef:
     resolver: git
     params:

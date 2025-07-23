@@ -1,0 +1,5 @@
+# https://github.com/goss-org/goss/blob/master/docs/schema.yaml
+# https://github.com/goss-org/goss/blob/master/examples/goss.yaml
+command:
+  echo 'Hello, World!':
+    exit-status: 0
