@@ -122,6 +122,14 @@ spec:
     description: Tag of the OpenShift CLI from registry.redhat.io/openshift4/ose-cli to use for ephemeral namespace tasks.
     name: ephemeral-namespace-oc-cli-version
     type: string
+  - default: ""
+    description: Path to a file with goss tests for container structure test.
+    name: goss-container-structure-test-file
+    type: string
+  - default: "/bin/sh"
+    description: Path to the shell in container to use for ephemeral tasks.
+    name: container-shell-path
+    type: string
   results:
   - description: ""
     name: IMAGE_URL
@@ -538,6 +546,8 @@ spec:
       operator: in
       values:
       - "false"
+
+  ### Setup ephemeral namespace
   - name: deploy-ephemeral-namespace
     runAfter:
     - init
@@ -564,12 +574,113 @@ spec:
       operator: notin
       values:
       - ""
-  - name: run-in-ephemeral-namespace
+
+  ### Container Structure Test
+  - name: container-structure-test
     workspaces:
     - name: source
       workspace: workspace
     runAfter:
       - deploy-ephemeral-namespace
+      - build-image-index
+    params:
+    - name: SCRIPT_PATH
+      value: $(params.goss-container-structure-test-file)
+    - name: IMAGE_URL
+      value: $(tasks.build-image-index.results.IMAGE_URL)
+    - name: SHELL_PATH
+      value: $(params.container-shell-path)
+    taskSpec:
+      steps:
+      - name: run-script
+        image: registry.redhat.io/openshift4/ose-cli:$(params.ephemeral-namespace-oc-cli-version)
+        workingDir: $(workspaces.source.path)/source
+        env:
+        - name: KUBECONFIG_VALUE
+          valueFrom:
+            secretKeyRef:
+              name: "$(tasks.deploy-ephemeral-namespace.results.secretRef)"
+              key: kubeconfig
+        - name: SCRIPT_PATH
+          value: $(params.goss-container-structure-test-file)
+        - name: IMAGE_URL
+          value: $(tasks.build-image-index.results.IMAGE_URL)
+        - name: SHELL_PATH
+          value: $(params.container-shell-path)
+        script: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          # Lets ensure a unique pod name - just to be safe
+          POD_NAME="image-under-test-$(uuidgen)"
+
+          # Expose KUBECONFIG for test namespace
+          cat <<< "$KUBECONFIG_VALUE" > /tmp/cfg
+          export KUBECONFIG=/tmp/cfg
+
+          # Create pod definition at /tmp/pod.yaml
+          cat > /tmp/pod.yaml <<EOF
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: ${POD_NAME}
+            labels:
+              app: ${POD_NAME}
+              env: ci
+          spec:
+            restartPolicy: Never
+            containers:
+            - name: app
+              image: ${IMAGE_URL}
+              # Lets make sure the pod doesnt do anything while under structure test
+              command: ["${SHELL_PATH}", "-c", "while true; do sleep 86400; done"]
+          EOF
+
+          echo "Deploy ${IMAGE_URL}"
+          oc apply -f /tmp/pod.yaml
+
+          # TODO: goss should be prepaked in ci image
+          echo ""
+          echo "Get https://github.com/goss-org/goss"
+          curl -L https://github.com/goss-org/goss/releases/download/v0.4.9/goss-linux-amd64 -o /tmp/goss
+          chmod +x /tmp/goss
+
+          echo ""
+          echo "Wait for pod to be ready"
+          oc wait --for=condition=Ready pod/${POD_NAME} --timeout=10s
+
+          echo ""
+          echo "Upload goss to pod"
+          # Cannot rely on oc cp as it requires tar - https://access.redhat.com/solutions/6993106
+          base64 /tmp/goss | oc exec -i ${POD_NAME} -- ${SHELL_PATH} -c "base64 -d > /tmp/goss"
+          oc exec -i ${POD_NAME} -- chmod +x /tmp/goss
+          base64 ${SCRIPT_PATH} | oc exec -i ${POD_NAME} -- ${SHELL_PATH} -c "base64 -d > /tmp/goss.yaml"
+          oc exec -i ${POD_NAME} -- cat /tmp/goss.yaml
+
+          echo ""
+          echo "Run goss validate"
+          oc exec -i ${POD_NAME} -- /tmp/goss --gossfile /tmp/goss.yaml validate
+
+          echo "Cleanup"
+          oc delete pod ${POD_NAME}
+
+    when:
+    - input: $(params.skip-checks)
+      operator: in
+      values:
+      - "false"
+    - input: $(params.goss-container-structure-test-file)
+      operator: notin
+      values:
+      - ""
+
+  ### Custom script run in ephemeral namespace
+  - name: run-custom-script-in-ephemeral-namespace
+    workspaces:
+    - name: source
+      workspace: workspace
+    runAfter:
+      - container-structure-test
       - build-image-index
     params:
     - name: SCRIPT_PATH
