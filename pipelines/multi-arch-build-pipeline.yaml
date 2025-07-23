@@ -633,7 +633,10 @@ spec:
             - name: app
               image: ${IMAGE_URL}
               # Lets make sure the pod doesnt do anything while under structure test
-              command: ["${SHELL_PATH}", "-c", "while true; do sleep 86400; done"]
+              command: ["${SHELL_PATH}"]
+              args:
+              - -c
+              - "while true; do sleep 86400; done"
           EOF
 
           echo "Deploy ${IMAGE_URL}"
