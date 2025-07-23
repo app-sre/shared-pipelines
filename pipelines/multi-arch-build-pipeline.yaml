@@ -41,6 +41,12 @@ spec:
     workspaces:
     - name: workspace
       workspace: workspace
+  workspaces:
+  - name: workspace
+  - name: git-auth
+    optional: true
+  - name: netrc
+    optional: true
   params:
   - default: ""
     description: Specify which stage to build in a multi-stage Dockerfile.
@@ -551,10 +557,46 @@ spec:
       values:
       - "false"
 
+########################
+# Custom Sections
+########################
+
+  # Lets make source code available in compliant fashion
+  # TODO: ideally whole pipeline gets converted to use OCI-TA compliance
+  - name: clone-repository-oci-ta
+    params:
+    - name: url
+      value: $(params.git-url)
+    - name: revision
+      value: $(params.revision)
+    - name: ociStorage
+      value: $(params.output-image).git
+    - name: ociArtifactExpiresAfter
+      value: $(params.image-expires-after)
+    runAfter:
+    - init
+    taskRef:
+      params:
+      - name: name
+        value: git-clone-oci-ta
+      - name: bundle
+        value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:d35e5d501cb5f5f88369511f76249857cb5ac30250e1dcf086939321964ff6b9
+      - name: kind
+        value: task
+      resolver: bundles
+    when:
+    - input: $(tasks.init.results.build)
+      operator: in
+      values:
+      - "true"
+    workspaces:
+    - name: basic-auth
+      workspace: git-auth
+
   ### Setup ephemeral namespace
   - name: deploy-ephemeral-namespace
     runAfter:
-    - init
+    - clone-repository-oci-ta
     taskRef:
       resolver: git
       params:
@@ -582,14 +624,14 @@ spec:
       - ""
 
   ### Container Structure Test
+  # For task compliance follow https://konflux.pages.redhat.com/docs/users/building/using-trusted-artifacts.html#migrate-to-trusted-artifacts
   - name: container-structure-test
-    workspaces:
-    - name: source
-      workspace: workspace
     runAfter:
       - deploy-ephemeral-namespace
       - build-image-index
     params:
+    - name: SOURCE_ARTIFACT
+      value: $(tasks.clone-repository-oci-ta.results.SOURCE_ARTIFACT)
     - name: SCRIPT_PATH
       value: $(params.goss-container-structure-test-file)
     - name: IMAGE_URL
@@ -599,10 +641,28 @@ spec:
     - name: POD_WAIT_TIMEOUT
       value: $(params.ephemeral-pod-wait-timeout)
     taskSpec:
+      params:
+      - description: The Trusted Artifact URI pointing to the artifact with the application source code.
+        name: SOURCE_ARTIFACT
+        type: string
+      stepTemplate:
+        volumeMounts:
+        - mountPath: /var/workdir
+          name: workdir
+      volumes:
+      # New volume to store a copy of the source code accessible only to this Task.
+      - name: workdir
+        emptyDir: {}
       steps:
+      # New step to fetch the Trusted Artifact and make it available to the next steps.
+      - name: use-trusted-artifact
+        image: quay.io/redhat-appstudio/build-trusted-artifacts:latest@sha256:8391272c4e5011120e9e7fee2c1f339e9405366110bf239dadcbc21e953ce099
+        args:
+          - use
+          - $(params.SOURCE_ARTIFACT)=/var/workdir/source
       - name: run-script
         image: registry.redhat.io/openshift4/ose-cli:$(params.ephemeral-namespace-oc-cli-version)
-        workingDir: $(workspaces.source.path)/source
+        workingDir: /var/workdir/source
         env:
         - name: KUBECONFIG_VALUE
           valueFrom:
@@ -688,14 +748,14 @@ spec:
       - ""
 
   ### Custom script run in ephemeral namespace
+  # For task compliance follow https://konflux.pages.redhat.com/docs/users/building/using-trusted-artifacts.html#migrate-to-trusted-artifacts
   - name: run-custom-script-in-ephemeral-namespace
-    workspaces:
-    - name: source
-      workspace: workspace
     runAfter:
       - container-structure-test
       - build-image-index
     params:
+    - name: SOURCE_ARTIFACT
+      value: $(tasks.clone-repository-oci-ta.results.SOURCE_ARTIFACT)
     - name: SCRIPT_PATH
       value: $(params.ephemeral-namespace-run-script)
     - name: IMAGE_URL
@@ -703,10 +763,28 @@ spec:
     - name: IMAGE_DIGEST
       value: $(tasks.build-image-index.results.IMAGE_DIGEST)
     taskSpec:
+      params:
+      - description: The Trusted Artifact URI pointing to the artifact with the application source code.
+        name: SOURCE_ARTIFACT
+        type: string
+      stepTemplate:
+        volumeMounts:
+        - mountPath: /var/workdir
+          name: workdir
+      volumes:
+      # New volume to store a copy of the source code accessible only to this Task.
+      - name: workdir
+        emptyDir: {}
       steps:
+      # New step to fetch the Trusted Artifact and make it available to the next steps.
+      - name: use-trusted-artifact
+        image: quay.io/redhat-appstudio/build-trusted-artifacts:latest@sha256:8391272c4e5011120e9e7fee2c1f339e9405366110bf239dadcbc21e953ce099
+        args:
+          - use
+          - $(params.SOURCE_ARTIFACT)=/var/workdir/source
       - name: run-script
         image: registry.redhat.io/openshift4/ose-cli:$(params.ephemeral-namespace-oc-cli-version)
-        workingDir: $(workspaces.source.path)/source
+        workingDir: /var/workdir/source
         env:
         - name: KUBECONFIG_VALUE
           valueFrom:
@@ -740,9 +818,3 @@ spec:
       operator: notin
       values:
       - ""
-  workspaces:
-  - name: workspace
-  - name: git-auth
-    optional: true
-  - name: netrc
-    optional: true
