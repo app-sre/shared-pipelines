@@ -130,6 +130,10 @@ spec:
     description: Path to the shell in container to use for ephemeral tasks.
     name: container-shell-path
     type: string
+  - default: "30s"
+    description: Timeout for pod under-test to be ready in ephemeral environment tests.
+    name: ephemeral-pod-wait-timeout
+    type: string
   results:
   - description: ""
     name: IMAGE_URL
@@ -590,6 +594,8 @@ spec:
       value: $(tasks.build-image-index.results.IMAGE_URL)
     - name: SHELL_PATH
       value: $(params.container-shell-path)
+    - name: POD_WAIT_TIMEOUT
+      value: $(params.ephemeral-pod-wait-timeout)
     taskSpec:
       steps:
       - name: run-script
@@ -607,6 +613,8 @@ spec:
           value: $(tasks.build-image-index.results.IMAGE_URL)
         - name: SHELL_PATH
           value: $(params.container-shell-path)
+        - name: POD_WAIT_TIMEOUT
+          value: $(params.ephemeral-pod-wait-timeout)
         script: |
           #!/usr/bin/env bash
           set -euo pipefail
@@ -650,7 +658,7 @@ spec:
 
           echo ""
           echo "Wait for pod to be ready"
-          oc wait --for=condition=Ready pod/${POD_NAME} --timeout=10s
+          oc wait --for=condition=Ready pod/${POD_NAME} --timeout=${POD_WAIT_TIMEOUT}
 
           echo ""
           echo "Upload goss to pod"
