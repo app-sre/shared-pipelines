@@ -589,6 +589,10 @@ spec:
       operator: in
       values:
       - "true"
+    - input: "$(params.ephemeral-namespace-run-script)$(params.goss-container-structure-test-file)"
+      operator: notin
+      values:
+      - ""
     workspaces:
     - name: basic-auth
       workspace: git-auth
