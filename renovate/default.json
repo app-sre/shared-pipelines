@@ -24,6 +24,7 @@
   },
   "dependencyDashboard": true,
   "semanticCommits": "enabled",
+  "minimumReleaseAge": "1 day",
   "packageRules": [
     {
       "description": "Red Hat Versioning docker images",
