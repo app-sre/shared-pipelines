@@ -140,6 +140,14 @@ spec:
     description: Timeout for pod under-test to be ready in ephemeral environment tests.
     name: ephemeral-pod-wait-timeout
     type: string
+  - default: ""
+    description: User ID responsible for the commit
+    name: github-user-id
+    type: string
+  - default: ""
+    description: Type of the PR for SQS auto bumping to know which repo to bump
+    name: sqs-pr-type
+    type: string
   results:
   - description: ""
     name: IMAGE_URL
@@ -612,6 +620,8 @@ spec:
           value: 05686269c33b8f1aac66252c0c7b859b42dca2ed
         - name: pathInRepo
           value: task/eaas-provision-space/0.1/eaas-provision-space.yaml
+        - name: shortCommitLength
+          value: 7
     params:
       - name: ownerName
         value: $(context.pipelineRun.name)
@@ -819,6 +829,83 @@ spec:
       values:
       - "false"
     - input: $(params.ephemeral-namespace-run-script)
+      operator: notin
+      values:
+      - ""
+
+  # send SQS message for auto bump MRs
+  - name: send-sqs-message
+    params:
+    - name: sqs-pr-type
+      value: $(params.sqs-pr-type)
+    - name: skip-checks
+      value: $(params.skip-checks)
+    - name: github-user-id
+      value: $(params.github-user-id)
+    runAfter:
+      - clamav-scan
+      - push-dockerfile
+      - clair-scan
+      - rpms-signature-scan
+      - container-structure-test
+      - run-custom-script-in-ephemeral-namespace
+      - ecosystem-cert-preflight-checks
+      - apply-tags
+      - sast-shell-check
+      - deprecated-base-image-check
+      - sast-unicode-check
+      - build-source-image
+      - sast-snyk-check
+    taskSpec:
+      steps:
+      - name: run-script
+        # TODO: do we have sth from redhat here?
+        image: public.ecr.aws/aws-cli/aws-cli:2.28.12
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: app-sre-app-interface-sqs-credentials
+              key: aws_access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-sre-app-interface-sqs-credentials
+              key: aws_secret_access_key
+        - name: AWS_REGION
+          valueFrom:
+            secretKeyRef:
+              name: app-sre-app-interface-sqs-credentials
+              key: aws_region
+        - name: SQS_QUEUE_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-sre-app-interface-sqs-credentials
+              key: sqs_url
+        - name: GITHUB_USER_ID
+          value: $(params.github-user-id)
+        - name: PR_TYPE
+          value: $(params.sqs-pr-type)
+        - name: COMMIT
+          value: $(tasks.clone-repository-oci-ta.results.commit)
+        - name: SHORT_COMMIT
+          value: $(tasks.clone-repository-oci-ta.results.short-commit)
+        script: |
+          #!/usr/bin/env bash
+          echo "GITHUB_USER_ID: ${GITHUB_USER_ID}"
+          echo "COMMIT: ${COMMIT}"
+          echo "SHORT_COMMIT: ${SHORT_COMMIT}"
+          echo "AWS_REGION: ${AWS_REGION}"
+          echo "SQS_QUEUE_URL: ${SQS_QUEUE_URL}"
+          echo "PR_TYPE: ${PR_TYPE}"
+          aws sqs send-message --queue-url ${SQS_QUEUE_URL} --message-body "{\"pr_type\": \"${PR_TYPE}\", \"version\": \"${SHORT_COMMIT}\", \"commit_sha\": \"${COMMIT}\", \"github_user_id\": \"${GITHUB_USER_ID}\"}"
+
+    when:
+    - input: $(params.skip-checks)
+      operator: in
+      values:
+      - "false"
+    - input: $(params.sqs-pr-type)
       operator: notin
       values:
       - ""
