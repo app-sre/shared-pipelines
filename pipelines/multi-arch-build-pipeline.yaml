@@ -847,7 +847,6 @@ spec:
       - push-dockerfile
       - clair-scan
       - rpms-signature-scan
-      - run-custom-script-in-ephemeral-namespace
       - ecosystem-cert-preflight-checks
       - apply-tags
       - sast-shell-check
