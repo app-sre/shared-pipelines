@@ -632,7 +632,7 @@ spec:
       operator: in
       values:
       - "false"
-    - input: "$(params.ephemeral-namespace-run-script)$(params.goss-container-structure-test-file)"
+    - input: "$(params.ephemeral-namespace-run-script)$(params.goss-container-structure-test-file)$(params.sqs-pr-type)"
       operator: notin
       values:
       - ""
