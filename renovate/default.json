@@ -7,21 +7,6 @@
     "group:allDigest"
   ],
   "updateNotScheduled": true,
-  "dockerfile": {
-    "schedule": ["after 5am"]
-  },
-  "pip_requirements": {
-    "schedule": ["after 5am"]
-  },
-  "pip_setup": {
-    "schedule": ["after 5am"]
-  },
-  "pep621": {
-    "schedule": ["after 5am"]
-  },
-  "tekton": {
-    "schedule": ["after 5am"]
-  },
   "dependencyDashboard": true,
   "semanticCommits": "enabled",
   "minimumReleaseAge": "1 day",
