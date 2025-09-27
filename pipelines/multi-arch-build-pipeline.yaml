@@ -110,12 +110,12 @@ spec:
     name: additional_secret
     type: string
   - default: "false"
-    # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
+      # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
     description: Fetch all tags for the repo.
     name: fetchTags
     type: string
   - default: "1"
-    # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
+      # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
     description: Perform a shallow clone, fetching only the most recent N commits.
     name: cloneDepth
     type: string
@@ -123,7 +123,7 @@ spec:
     description: Script to run in ephemeral namespace. If empty, ephemeral namespace tasks are skipped.
     name: ephemeral-namespace-run-script
     type: string
-  # https://catalog.redhat.com/software/containers/openshift4/ose-cli/5cd9ba3f5a13467289f4d51d/history?architecture=amd64
+    # https://catalog.redhat.com/software/containers/openshift4/ose-cli/5cd9ba3f5a13467289f4d51d/history?architecture=amd64
   - default: "v4.15"
     description: Tag of the OpenShift CLI from registry.redhat.io/openshift4/ose-cli to use for ephemeral namespace tasks.
     name: ephemeral-namespace-oc-cli-version
@@ -148,6 +148,10 @@ spec:
     description: Type of the PR for SQS auto bumping to know which repo to bump
     name: sqs-pr-type
     type: string
+  - name: buildah-format
+    default: docker
+    type: string
+    description: The format for the resulting image's mediaType. Valid values are oci or docker.
   results:
   - description: ""
     name: IMAGE_URL
@@ -175,7 +179,7 @@ spec:
       - name: name
         value: init
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-init:0.2@sha256:ec962d0be18f36ca7d331c99bf243800f569fc0a2ea6f8c8c3d3a574b71c44dc
+        value: quay.io/konflux-ci/tekton-catalog/task-init:0.2@sha256:abf231cfc5a68b56f68a8ac9bb26dca3c3e434c88dd9627c72bdec0b8c335c67
       - name: kind
         value: task
       resolver: bundles
@@ -185,7 +189,7 @@ spec:
       value: $(params.git-url)
     - name: revision
       value: $(params.revision)
-        # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
+          # https://github.com/konflux-ci/build-definitions/tree/main/task/git-clone/0.1
     - name: fetchTags
       value: $(params.fetchTags)
     - name: depth
@@ -263,6 +267,8 @@ spec:
       value: $(params.build-args-file)
     - name: ADDITIONAL_SECRET
       value: $(params.additional_secret)
+    - name: BUILDAH_FORMAT
+      value: $(params.buildah-format)
     runAfter:
     - prefetch-dependencies
     taskRef:
@@ -295,6 +301,8 @@ spec:
     - name: IMAGES
       value:
       - $(tasks.build-container.results.IMAGE_URL)@$(tasks.build-container.results.IMAGE_DIGEST)
+    - name: BUILDAH_FORMAT
+      value: $(params.buildah-format)
     runAfter:
     - build-container
     taskRef:
@@ -564,13 +572,11 @@ spec:
       operator: in
       values:
       - "false"
-
-########################
-# Custom Sections
-########################
-
-  # Lets make source code available in compliant fashion
-  # TODO: ideally whole pipeline gets converted to use OCI-TA compliance
+            ########################
+            # Custom Sections
+            ########################
+    # Lets make source code available in compliant fashion
+    # TODO: ideally whole pipeline gets converted to use OCI-TA compliance
   - name: clone-repository-oci-ta
     params:
     - name: url
@@ -604,29 +610,28 @@ spec:
     workspaces:
     - name: basic-auth
       workspace: git-auth
-
-  ### Setup ephemeral namespace
+    ### Setup ephemeral namespace
   - name: deploy-ephemeral-namespace
     runAfter:
     - clone-repository-oci-ta
     taskRef:
       resolver: git
       params:
-        - name: url
-          value: https://github.com/konflux-ci/build-definitions.git
-        - name: revision
-          # Note, we must use a concrete commit ID or enterprise contract will fail
-          # The violation log will show you the allowed/trusted commit ref to use
-          value: 05686269c33b8f1aac66252c0c7b859b42dca2ed
-        - name: pathInRepo
-          value: task/eaas-provision-space/0.1/eaas-provision-space.yaml
-        - name: shortCommitLength
-          value: 7
+      - name: url
+        value: https://github.com/konflux-ci/build-definitions.git
+      - name: revision
+            # Note, we must use a concrete commit ID or enterprise contract will fail
+            # The violation log will show you the allowed/trusted commit ref to use
+        value: 05686269c33b8f1aac66252c0c7b859b42dca2ed
+      - name: pathInRepo
+        value: task/eaas-provision-space/0.1/eaas-provision-space.yaml
+      - name: shortCommitLength
+        value: 7
     params:
-      - name: ownerName
-        value: $(context.pipelineRun.name)
-      - name: ownerUid
-        value: $(context.pipelineRun.uid)
+    - name: ownerName
+      value: $(context.pipelineRun.name)
+    - name: ownerUid
+      value: $(context.pipelineRun.uid)
     when:
     - input: $(params.skip-checks)
       operator: in
@@ -636,13 +641,12 @@ spec:
       operator: notin
       values:
       - ""
-
-  ### Container Structure Test
-  # For task compliance follow https://konflux.pages.redhat.com/docs/users/building/using-trusted-artifacts.html#migrate-to-trusted-artifacts
+    ### Container Structure Test
+    # For task compliance follow https://konflux.pages.redhat.com/docs/users/building/using-trusted-artifacts.html#migrate-to-trusted-artifacts
   - name: container-structure-test
     runAfter:
-      - deploy-ephemeral-namespace
-      - build-image-index
+    - deploy-ephemeral-namespace
+    - build-image-index
     params:
     - name: SOURCE_ARTIFACT
       value: $(tasks.clone-repository-oci-ta.results.SOURCE_ARTIFACT)
@@ -664,16 +668,16 @@ spec:
         - mountPath: /var/workdir
           name: workdir
       volumes:
-      # New volume to store a copy of the source code accessible only to this Task.
+          # New volume to store a copy of the source code accessible only to this Task.
       - name: workdir
         emptyDir: {}
       steps:
-      # New step to fetch the Trusted Artifact and make it available to the next steps.
+          # New step to fetch the Trusted Artifact and make it available to the next steps.
       - name: use-trusted-artifact
         image: quay.io/redhat-appstudio/build-trusted-artifacts:latest@sha256:9b180776a41d9a22a1c51539f1647c60defbbd55b44bbebdd4130e33512d8b0d
         args:
-          - use
-          - $(params.SOURCE_ARTIFACT)=/var/workdir/source
+        - use
+        - $(params.SOURCE_ARTIFACT)=/var/workdir/source
       - name: run-script
         image: registry.redhat.io/openshift4/ose-cli:$(params.ephemeral-namespace-oc-cli-version)
         workingDir: /var/workdir/source
@@ -750,7 +754,6 @@ spec:
 
           echo "Cleanup"
           oc delete pod ${POD_NAME}
-
     when:
     - input: $(params.skip-checks)
       operator: in
@@ -760,13 +763,12 @@ spec:
       operator: notin
       values:
       - ""
-
-  ### Custom script run in ephemeral namespace
-  # For task compliance follow https://konflux.pages.redhat.com/docs/users/building/using-trusted-artifacts.html#migrate-to-trusted-artifacts
+    ### Custom script run in ephemeral namespace
+    # For task compliance follow https://konflux.pages.redhat.com/docs/users/building/using-trusted-artifacts.html#migrate-to-trusted-artifacts
   - name: run-custom-script-in-ephemeral-namespace
     runAfter:
-      - container-structure-test
-      - build-image-index
+    - container-structure-test
+    - build-image-index
     params:
     - name: SOURCE_ARTIFACT
       value: $(tasks.clone-repository-oci-ta.results.SOURCE_ARTIFACT)
@@ -786,16 +788,16 @@ spec:
         - mountPath: /var/workdir
           name: workdir
       volumes:
-      # New volume to store a copy of the source code accessible only to this Task.
+          # New volume to store a copy of the source code accessible only to this Task.
       - name: workdir
         emptyDir: {}
       steps:
-      # New step to fetch the Trusted Artifact and make it available to the next steps.
+          # New step to fetch the Trusted Artifact and make it available to the next steps.
       - name: use-trusted-artifact
         image: quay.io/redhat-appstudio/build-trusted-artifacts:latest@sha256:9b180776a41d9a22a1c51539f1647c60defbbd55b44bbebdd4130e33512d8b0d
         args:
-          - use
-          - $(params.SOURCE_ARTIFACT)=/var/workdir/source
+        - use
+        - $(params.SOURCE_ARTIFACT)=/var/workdir/source
       - name: run-script
         image: registry.redhat.io/openshift4/ose-cli:$(params.ephemeral-namespace-oc-cli-version)
         workingDir: /var/workdir/source
@@ -822,7 +824,6 @@ spec:
           echo "Running script ${SCRIPT_PATH}"
           chmod +x ./${SCRIPT_PATH}
           ./${SCRIPT_PATH}
-
     when:
     - input: $(params.skip-checks)
       operator: in
@@ -832,8 +833,7 @@ spec:
       operator: notin
       values:
       - ""
-
-  # send SQS message for auto bump MRs
+    # send SQS message for auto bump MRs
   - name: send-sqs-message
     params:
     - name: sqs-pr-type
@@ -843,22 +843,22 @@ spec:
     - name: github-user-id
       value: $(params.github-user-id)
     runAfter:
-      - clamav-scan
-      - push-dockerfile
-      - clair-scan
-      - rpms-signature-scan
-      - run-custom-script-in-ephemeral-namespace
-      - ecosystem-cert-preflight-checks
-      - apply-tags
-      - sast-shell-check
-      - deprecated-base-image-check
-      - sast-unicode-check
-      - build-source-image
-      - sast-snyk-check
+    - clamav-scan
+    - push-dockerfile
+    - clair-scan
+    - rpms-signature-scan
+    - run-custom-script-in-ephemeral-namespace
+    - ecosystem-cert-preflight-checks
+    - apply-tags
+    - sast-shell-check
+    - deprecated-base-image-check
+    - sast-unicode-check
+    - build-source-image
+    - sast-snyk-check
     taskSpec:
       steps:
       - name: run-script
-        # TODO: do we have sth from redhat here?
+            # TODO: do we have sth from redhat here?
         image: public.ecr.aws/aws-cli/aws-cli:2.30.6@sha256:a5293ba8b204537322645402be15c8de318af8e5351f1a43186e7db1c3fcc235
         env:
         - name: AWS_ACCESS_KEY_ID
@@ -898,7 +898,6 @@ spec:
           echo "SQS_QUEUE_URL: ${SQS_QUEUE_URL}"
           echo "PR_TYPE: ${PR_TYPE}"
           aws sqs send-message --queue-url ${SQS_QUEUE_URL} --message-body "{\"pr_type\": \"${PR_TYPE}\", \"version\": \"${SHORT_COMMIT}\", \"commit_sha\": \"${COMMIT}\", \"github_user_id\": \"${GITHUB_USER_ID}\"}"
-
     when:
     - input: $(params.skip-checks)
       operator: in
