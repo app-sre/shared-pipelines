@@ -859,7 +859,7 @@ spec:
       steps:
       - name: run-script
             # TODO: do we have sth from redhat here?
-        image: public.ecr.aws/aws-cli/aws-cli:2.31.5@sha256:9cb6ab9c8852d7e1e63f43299dca0628e92448d1c7589f7ed40344e7f61aad59
+        image: public.ecr.aws/aws-cli/aws-cli:2.31.8@sha256:09c29bfea4a4057d03b2f1d2aac04ef27fa27632765b29277fd3245fbc665588
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
