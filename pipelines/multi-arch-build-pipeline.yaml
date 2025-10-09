@@ -52,6 +52,11 @@ spec:
     description: Specify which stage to build in a multi-stage Dockerfile.
     name: target-stage
     type: string
+  # https://github.com/konflux-ci/build-definitions/tree/main/task/buildah/0.5
+  - default: true
+    description: Whether to skip stages in Containerfile that seem unused by subsequent stages
+    name: skip-unused-stages
+    type: string
   - description: Source Repository URL
     name: git-url
     type: string
@@ -269,6 +274,8 @@ spec:
       value: $(params.additional_secret)
     - name: BUILDAH_FORMAT
       value: $(params.buildah-format)
+    - name: SKIP_UNUSED_STAGES
+      value: $(params.skip-unused-stages)
     runAfter:
     - prefetch-dependencies
     taskRef:
