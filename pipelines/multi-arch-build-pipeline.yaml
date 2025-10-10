@@ -137,10 +137,6 @@ spec:
     description: Path to a file with goss tests for container structure test.
     name: goss-container-structure-test-file
     type: string
-  - default: "/bin/sh"
-    description: Path to the shell in container to use for ephemeral tasks.
-    name: container-shell-path
-    type: string
   - default: "30s"
     description: Timeout for pod under-test to be ready in ephemeral environment tests.
     name: ephemeral-pod-wait-timeout
@@ -661,8 +657,6 @@ spec:
       value: $(params.goss-container-structure-test-file)
     - name: IMAGE_URL
       value: $(tasks.build-image-index.results.IMAGE_URL)
-    - name: SHELL_PATH
-      value: $(params.container-shell-path)
     - name: POD_WAIT_TIMEOUT
       value: $(params.ephemeral-pod-wait-timeout)
     taskSpec:
@@ -698,69 +692,92 @@ spec:
           value: $(params.goss-container-structure-test-file)
         - name: IMAGE_URL
           value: $(tasks.build-image-index.results.IMAGE_URL)
-        - name: SHELL_PATH
-          value: $(params.container-shell-path)
         - name: POD_WAIT_TIMEOUT
           value: $(params.ephemeral-pod-wait-timeout)
         script: |
           #!/usr/bin/env bash
           set -euo pipefail
 
-          # Lets ensure a unique pod name - just to be safe
-          POD_NAME="image-under-test-$(uuidgen)"
+          # Lets ensure a unique job name - just to be safe
+          JOB_NAME="goss-test-$(uuidgen)"
 
           # Expose KUBECONFIG for test namespace
-          cat <<< "$KUBECONFIG_VALUE" > /tmp/cfg
+          echo "$KUBECONFIG_VALUE" > /tmp/cfg
           export KUBECONFIG=/tmp/cfg
 
-          # Create pod definition at /tmp/pod.yaml
-          cat > /tmp/pod.yaml <<EOF
-          apiVersion: v1
-          kind: Pod
+          # Cleanup function to ensure resources are deleted
+          cleanup() {
+            echo "Cleanup"
+            oc delete job ${JOB_NAME} 2>/dev/null || true
+            oc delete configmap ${JOB_NAME} 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          # Create ConfigMap with goss test file
+          echo "Creating ConfigMap with goss test configuration"
+          oc create configmap ${JOB_NAME} --from-file=goss.yaml=${SCRIPT_PATH}
+
+          # Create job definition at /tmp/job.yaml
+          cat > /tmp/job.yaml <<EOF
+          apiVersion: batch/v1
+          kind: Job
           metadata:
-            name: ${POD_NAME}
+            name: ${JOB_NAME}
             labels:
-              app: ${POD_NAME}
+              app: ${JOB_NAME}
               env: ci
           spec:
-            restartPolicy: Never
-            containers:
-            - name: app
-              image: ${IMAGE_URL}
-              # Lets make sure the pod doesnt do anything while under structure test
-              command: ["${SHELL_PATH}"]
-              args:
-              - -c
-              - "while true; do sleep 86400; done"
+            backoffLimit: 0
+            template:
+              metadata:
+                labels:
+                  app: ${JOB_NAME}
+              spec:
+                restartPolicy: Never
+                initContainers:
+                - name: copy-goss
+                  image: ghcr.io/goss-org/goss:v0.4.9
+                  command: ["/bin/sh", "-c"]
+                  args:
+                  - |
+                    cp /usr/bin/goss /goss/bin/goss
+                    chmod +x /goss/bin/goss
+                  volumeMounts:
+                  - name: goss-bin
+                    mountPath: /goss/bin
+                containers:
+                - name: app
+                  image: ${IMAGE_URL}
+                  command: ["/goss/bin/goss"]
+                  args: ["--gossfile", "/goss/config/goss.yaml", "validate"]
+                  volumeMounts:
+                  - name: goss-bin
+                    mountPath: /goss/bin
+                  - name: goss-config
+                    mountPath: /goss/config
+                volumes:
+                - name: goss-bin
+                  emptyDir: {}
+                - name: goss-config
+                  configMap:
+                    name: ${JOB_NAME}
           EOF
 
-          echo "Deploy ${IMAGE_URL}"
-          oc apply -f /tmp/pod.yaml
+          echo "Deploy goss test job for ${IMAGE_URL}"
+          oc apply -f /tmp/job.yaml
 
-          # TODO: goss should be prepaked in ci image
-          echo ""
-          echo "Get https://github.com/goss-org/goss"
-          curl -L https://github.com/goss-org/goss/releases/download/v0.4.9/goss-linux-amd64 -o /tmp/goss
-          chmod +x /tmp/goss
+          echo "Wait for job to complete"
+          oc wait --for=condition=Complete job/${JOB_NAME} --timeout=${POD_WAIT_TIMEOUT} || true
 
-          echo ""
-          echo "Wait for pod to be ready"
-          oc wait --for=condition=Ready pod/${POD_NAME} --timeout=${POD_WAIT_TIMEOUT}
+          echo "Job logs:"
+          oc logs job/${JOB_NAME}
 
-          echo ""
-          echo "Upload goss to pod"
-          # Cannot rely on oc cp as it requires tar - https://access.redhat.com/solutions/6993106
-          base64 /tmp/goss | oc exec -i ${POD_NAME} -- ${SHELL_PATH} -c "base64 -d > /tmp/goss"
-          oc exec -i ${POD_NAME} -- chmod +x /tmp/goss
-          base64 ${SCRIPT_PATH} | oc exec -i ${POD_NAME} -- ${SHELL_PATH} -c "base64 -d > /tmp/goss.yaml"
-          oc exec -i ${POD_NAME} -- cat /tmp/goss.yaml
-
-          echo ""
-          echo "Run goss validate"
-          oc exec -i ${POD_NAME} -- /tmp/goss --gossfile /tmp/goss.yaml validate
-
-          echo "Cleanup"
-          oc delete pod ${POD_NAME}
+          # Check if job succeeded
+          JOB_STATUS=$(oc get job ${JOB_NAME} -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}')
+          if [ "$JOB_STATUS" != "True" ]; then
+            echo "Job failed!"
+            exit 1
+          fi
     when:
     - input: $(params.skip-checks)
       operator: in
@@ -825,7 +842,7 @@ spec:
           set -euo pipefail
 
           # Expose KUBECONFIG for test namespace
-          cat <<< "$KUBECONFIG_VALUE" > /tmp/cfg
+          echo "$KUBECONFIG_VALUE" > /tmp/cfg
           export KUBECONFIG=/tmp/cfg
 
           echo "Running script ${SCRIPT_PATH}"

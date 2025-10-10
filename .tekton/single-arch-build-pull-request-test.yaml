@@ -10,7 +10,6 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: "10"
     pipelinesascode.tekton.dev/on-cel-expression: event == "pull_request" && target_branch
       == "main"
-  creationTimestamp: null
   labels:
     appstudio.openshift.io/application: shared-pipelines-main
     appstudio.openshift.io/component: single-arch-build-pipeline-main
@@ -26,13 +25,15 @@ spec:
   - name: output-image
     value: quay.io/redhat-user-workloads/app-sre-tenant/shared-pipelines-main/single-arch-build-pipeline-main:on-pr-{{revision}}
   - name: image-expires-after
-    value: 5d
+    value: "5d"
   - name: dockerfile
     value: pipeline-tests/Dockerfile
   - name: path-context
     value: .
   - name: target-stage
-    value: test
+    value: prod
+  - name: skip-unused-stages
+    value: "false"
   - name: ephemeral-namespace-run-script
     value: pipeline-tests/ephemeral-namespace-test.sh
   - name: goss-container-structure-test-file
