@@ -1,0 +1,38 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: test-job-template
+  annotations:
+    description: "Template for deploying a test job with the built image for integration tests"
+parameters:
+- name: IMAGE_URL
+  description: "The container image URL to deploy"
+  required: true
+- name: JOB_NAME
+  description: "Name of the job"
+  value: "test-integration"
+  required: true
+objects:
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: ${JOB_NAME}
+    labels:
+      app: ${JOB_NAME}
+      env: pipeline-test
+  spec:
+    backoffLimit: 0
+    template:
+      metadata:
+        labels:
+          app: ${JOB_NAME}
+          env: pipeline-test
+      spec:
+        restartPolicy: Never
+        containers:
+        - name: integration-test
+          image: ${IMAGE_URL}
+          command: ["/bin/sh", "-c"]
+          args:
+          - |
+            echo "integration test"

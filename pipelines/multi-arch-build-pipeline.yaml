@@ -842,7 +842,7 @@ spec:
           set -euo pipefail
 
           # Expose KUBECONFIG for test namespace
-          cat <<< "$KUBECONFIG_VALUE" > /tmp/cfg
+          echo "$KUBECONFIG_VALUE" > /tmp/cfg
           export KUBECONFIG=/tmp/cfg
 
           echo "Running script ${SCRIPT_PATH}"
