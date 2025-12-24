@@ -425,6 +425,13 @@ spec:
       operator: in
       values:
       - "false"
+    computeResources:
+     requests:
+       memory: "2Gi"
+       cpu: "500m"
+     limits:
+       memory: "2Gi"
+       cpu: "1"
   - name: sast-snyk-check
     params:
     - name: image-digest
