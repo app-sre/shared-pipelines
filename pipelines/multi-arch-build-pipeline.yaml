@@ -149,6 +149,10 @@ spec:
     description: Type of the PR for SQS auto bumping to know which repo to bump
     name: sqs-pr-type
     type: string
+  - default: "0"
+    description: "The length of time, in seconds, for which to delay a specific message. Valid values: 0 to 900."
+    name: sqs-delay-seconds
+    type: string
   - name: buildah-format
     default: docker
     type: string
@@ -919,6 +923,8 @@ spec:
           value: $(params.github-user-id)
         - name: PR_TYPE
           value: $(params.sqs-pr-type)
+        - name: DELAY_SECONDS
+          value: $(params.sqs-delay-seconds)
         - name: COMMIT
           value: $(tasks.clone-repository-oci-ta.results.commit)
         - name: SHORT_COMMIT
@@ -931,7 +937,8 @@ spec:
           echo "AWS_REGION: ${AWS_REGION}"
           echo "SQS_QUEUE_URL: ${SQS_QUEUE_URL}"
           echo "PR_TYPE: ${PR_TYPE}"
-          aws sqs send-message --queue-url ${SQS_QUEUE_URL} --message-body "{\"pr_type\": \"${PR_TYPE}\", \"version\": \"${SHORT_COMMIT}\", \"commit_sha\": \"${COMMIT}\", \"github_user_id\": \"${GITHUB_USER_ID}\"}"
+          echo "DELAY_SECONDS: ${DELAY_SECONDS}"
+          aws sqs send-message --queue-url ${SQS_QUEUE_URL} --delay-seconds ${DELAY_SECONDS} --message-body "{\"pr_type\": \"${PR_TYPE}\", \"version\": \"${SHORT_COMMIT}\", \"commit_sha\": \"${COMMIT}\", \"github_user_id\": \"${GITHUB_USER_ID}\"}"
     when:
     - input: $(params.skip-checks)
       operator: in
