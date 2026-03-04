@@ -137,7 +137,7 @@ spec:
     description: Path to a file with goss tests for container structure test.
     name: goss-container-structure-test-file
     type: string
-  - default: "30s"
+  - default: "60s"
     description: Timeout for pod under-test to be ready in ephemeral environment tests.
     name: ephemeral-pod-wait-timeout
     type: string
