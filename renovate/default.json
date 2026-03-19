@@ -10,6 +10,16 @@
   "dependencyDashboard": true,
   "semanticCommits": "enabled",
   "minimumReleaseAge": "1 day",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update uv required-version in pyproject.toml",
+      "fileMatch": ["pyproject.toml"],
+      "matchStrings": ["\\[tool\\.uv\\]\\srequired-version = \">=(?<currentValue>[\\d.]+)\""],
+      "depNameTemplate": "ghcr.io/astral-sh/uv",
+      "datasourceTemplate": "docker"
+    }
+  ],
   "packageRules": [
     {
       "description": "Red Hat Versioning docker images",
