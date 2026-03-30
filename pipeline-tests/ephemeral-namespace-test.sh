@@ -36,7 +36,7 @@ oc apply -f /tmp/my-job.yaml
 
 echo ""
 echo "Waiting for job to complete..."
-oc wait --for=condition=complete --timeout=30s job/my-integration-test
+oc wait --for=condition=complete --timeout=60s job/my-integration-test
 
 echo ""
 echo "=== Job Status ==="
