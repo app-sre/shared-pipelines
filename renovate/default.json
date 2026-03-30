@@ -5,7 +5,6 @@
     ":automergeDigest",
     "group:allDigest"
   ],
-  "schedule": ["after 5am every day"],
   "updateNotScheduled": true,
   "dependencyDashboard": true,
   "semanticCommits": "enabled",
@@ -20,7 +19,15 @@
       "datasourceTemplate": "docker"
     }
   ],
+  "tekton": {
+    "schedule": ["after 5am every day"]
+  },
   "packageRules": [
+    {
+      "description": "Allow Tekton and Docker task updates without releaseTimestamp (Quay does not expose timestamps)",
+      "matchManagers": ["tekton", "dockerfile"],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
+    },
     {
       "description": "Red Hat Versioning docker images",
       "matchDatasources": ["docker"],
