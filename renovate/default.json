@@ -1,11 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "github>konflux-ci/mintmaker//config/renovate/renovate.json",
     "config:best-practices",
     ":automergeDigest",
     "group:allDigest"
   ],
+  "schedule": ["after 5am every day"],
   "updateNotScheduled": true,
   "dependencyDashboard": true,
   "semanticCommits": "enabled",
