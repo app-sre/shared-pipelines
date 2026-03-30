@@ -293,7 +293,7 @@ spec:
       - name: name
         value: buildah
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-buildah:0.7@sha256:97b646590d8863a029c4105ed78391b7b2f378277da256b42c59a477fa87fca0
+        value: quay.io/konflux-ci/tekton-catalog/task-buildah:0.7@sha256:f6efcbdd0a18316a78455084b7361cab57aa8c5ed25acb3ce27ec7358ff25095
       - name: kind
         value: task
       resolver: bundles
@@ -492,7 +492,7 @@ spec:
       - name: name
         value: sast-unicode-check
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-sast-unicode-check:0.3@sha256:bc8f58d5fd484c31266f6f2ee292208066bdbd4010a171ef5a09ebc5f8a0de2d
+        value: quay.io/konflux-ci/tekton-catalog/task-sast-unicode-check:0.4@sha256:c0aa2aaf8f55e0f633f9eddca66a748051e01c0f6bb408e9efc10d8216e8664e
       - name: kind
         value: task
       resolver: bundles
@@ -539,7 +539,7 @@ spec:
       - name: name
         value: apply-tags
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-apply-tags:0.2@sha256:f8262b53ffd44f69ee7eeb380e3cfc77bb4c44ab79e554c2dac2fc07d01ca2a2
+        value: quay.io/konflux-ci/tekton-catalog/task-apply-tags:0.2@sha256:8d40376257a36842f7b7eedaf4f56ca3fb40582f01b9bfe3b56e19fcc1d7c9ee
       - name: kind
         value: task
       resolver: bundles
