@@ -20,9 +20,6 @@
       "datasourceTemplate": "docker"
     }
   ],
-  "tekton": {
-    "schedule": ["after 5am every day"]
-  },
   "packageRules": [
     {
       "description": "Red Hat Versioning docker images",
