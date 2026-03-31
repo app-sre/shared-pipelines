@@ -9,6 +9,7 @@
   "dependencyDashboard": true,
   "semanticCommits": "enabled",
   "minimumReleaseAge": "1 day",
+  "minimumReleaseAgeBehaviour": "timestamp-optional",
   "customManagers": [
     {
       "customType": "regex",
@@ -23,11 +24,6 @@
     "schedule": ["after 5am every day"]
   },
   "packageRules": [
-    {
-      "description": "Allow Tekton and Docker task updates without releaseTimestamp (Quay does not expose timestamps)",
-      "matchManagers": ["tekton", "dockerfile"],
-      "minimumReleaseAgeBehaviour": "timestamp-optional"
-    },
     {
       "description": "Red Hat Versioning docker images",
       "matchDatasources": ["docker"],
