@@ -45,6 +45,8 @@
       "matchPackageNames": ["ghcr.io/astral-sh/uv"],
       "datasources": ["docker"],
       "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "uv",
+      "groupSlug": "uv",
       "automerge": true
     },
     {
