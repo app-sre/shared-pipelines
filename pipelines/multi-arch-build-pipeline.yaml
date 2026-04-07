@@ -332,6 +332,7 @@ spec:
       - name: kind
         value: task
       resolver: bundles
+    when:
     - input: $(params.build-source-image)
       operator: in
       values:
@@ -441,7 +442,7 @@ spec:
       - name: name
         value: sast-shell-check
       - name: bundle
-        value: quay.io/konflux-ci/tekton-catalog/task-sast-shell-check:0.1@sha256:2cd09c97b9f0fae9c7bcd26d956f77221fb7137ee8b2ef17e7351b5e6f1eb89e
+        value: quay.io/konflux-ci/tekton-catalog/task-sast-shell-check:0.1@sha256:59ac80c2367a5b4d79f7655aa3a148213cfbcd0ea1886981ae4727f09ef47c90
       - name: kind
         value: task
       resolver: bundles
