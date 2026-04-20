@@ -5,11 +5,11 @@
     ":automergeDigest",
     "group:allDigest"
   ],
-  "schedule": ["after 5am every day"],
   "updateNotScheduled": true,
   "dependencyDashboard": true,
   "semanticCommits": "enabled",
   "minimumReleaseAge": "1 day",
+  "minimumReleaseAgeBehaviour": "timestamp-optional",
   "customManagers": [
     {
       "customType": "regex",
@@ -45,6 +45,8 @@
       "matchPackageNames": ["ghcr.io/astral-sh/uv"],
       "datasources": ["docker"],
       "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "uv",
+      "groupSlug": "uv",
       "automerge": true
     },
     {
