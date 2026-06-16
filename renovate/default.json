@@ -30,10 +30,12 @@
       "versioning": "redhat"
     },
     {
-      "description": "No minimumReleaseAge for internal app-sre-tenant images",
+      "description": "No minimumReleaseAge for Red Hat images",
       "matchDatasources": ["docker"],
       "matchPackageNames": [
-        "quay.io/redhat-services-prod/app-sre-tenant/**"
+        "quay.io/redhat-services-prod/app-sre-tenant/**",
+        "registry.access.redhat.com/**",
+        "registry.redhat.io/**"
       ],
       "minimumReleaseAge": null
     },
