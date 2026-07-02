@@ -614,6 +614,7 @@ spec:
   - name: deploy-ephemeral-namespace
     runAfter:
     - clone-repository-oci-ta
+    - build-container
     taskRef:
       resolver: git
       params:
