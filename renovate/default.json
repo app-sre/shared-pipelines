@@ -18,6 +18,14 @@
       "matchStrings": ["\\[tool\\.uv\\]\\srequired-version = \">=(?<currentValue>[\\d.]+)\""],
       "depNameTemplate": "ghcr.io/astral-sh/uv",
       "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "Update uv version in .tool-versions",
+      "fileMatch": ["(^|/)\\.tool-versions$"],
+      "matchStrings": ["(?:^|\\r\\n|\\r|\\n)uv (?<currentValue>[\\d.]+)"],
+      "depNameTemplate": "ghcr.io/astral-sh/uv",
+      "datasourceTemplate": "docker"
     }
   ],
   "packageRules": [
