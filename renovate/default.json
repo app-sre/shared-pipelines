@@ -108,10 +108,15 @@
       "enabled": false
     },
     {
-      "description": "Shared-pipelines pin: scoped rollout, no automerge by default",
+      "description": "Shared-pipelines pin: disabled outside the rollout scope",
       "matchDepNames": ["https://github.com/app-sre/shared-pipelines"],
-      "matchRepositories": ["app-sre/gabi"],
-      "excludeRepositories": ["app-sre/shared-pipelines"],
+      "excludeRepositories": ["app-sre/gabi", "app-sre/python-project-template"],
+      "enabled": false
+    },
+    {
+      "description": "Shared-pipelines pin (rollout scope): no automerge by default",
+      "matchDepNames": ["https://github.com/app-sre/shared-pipelines"],
+      "matchRepositories": ["app-sre/gabi", "app-sre/python-project-template"],
       "pinDigests": true,
       "groupName": "shared-pipelines-pin",
       "groupSlug": "shared-pipelines-pin",
