@@ -32,8 +32,8 @@
       "description": "Track shared-pipelines pipelineRef revision",
       "managerFilePatterns": ["/^\\.tekton/.*\\.ya?ml$/"],
       "matchStrings": [
-        "(?<prefix>github\\.com/app-sre/shared-pipelines(?:\\.git)?[\\s\\S]{0,200}?name: revision\\s+value: )(?<currentDigest>[0-9a-f]{40})",
-        "(?<prefix>github\\.com/app-sre/shared-pipelines(?:\\.git)?[\\s\\S]{0,200}?name: revision\\s+value: )(?<currentValue>main)"
+        "(?<prefix>github\\.com/app-sre/shared-pipelines(?:\\.git)?[\\s\\S]{0,200}?name: revision\\s+value: )\"?(?<currentDigest>[0-9a-f]{40})",
+        "(?<prefix>github\\.com/app-sre/shared-pipelines(?:\\.git)?[\\s\\S]{0,200}?name: revision\\s+value: )\"?(?<currentValue>main)"
       ],
       "depNameTemplate": "https://github.com/app-sre/shared-pipelines",
       "datasourceTemplate": "git-refs",
