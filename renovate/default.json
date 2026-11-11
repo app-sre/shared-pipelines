@@ -110,17 +110,43 @@
     {
       "description": "Shared-pipelines pin: disabled outside the rollout scope",
       "matchDepNames": ["https://github.com/app-sre/shared-pipelines"],
-      "excludeRepositories": ["app-sre/gabi", "app-sre/python-project-template"],
+      "excludeRepositories": [
+        "app-sre/er-aws-elasticache",
+        "app-sre/er-aws-kms",
+        "app-sre/er-aws-msk",
+        "app-sre/er-aws-msk-connect",
+        "app-sre/er-aws-rds",
+        "app-sre/er-aws-rds-proxy",
+        "app-sre/er-aws-vpc-endpoint",
+        "app-sre/er-aws-vpc-endpoint-service",
+        "app-sre/er-cloudflare-zone",
+        "app-sre/er-outputs-secrets",
+        "app-sre/gabi",
+        "app-sre/python-project-template"
+      ],
       "enabled": false
     },
     {
-      "description": "Shared-pipelines pin (rollout scope): no automerge by default",
+      "description": "Shared-pipelines pin (rollout scope)",
       "matchDepNames": ["https://github.com/app-sre/shared-pipelines"],
-      "matchRepositories": ["app-sre/gabi", "app-sre/python-project-template"],
+      "matchRepositories": [
+        "app-sre/er-aws-elasticache",
+        "app-sre/er-aws-kms",
+        "app-sre/er-aws-msk",
+        "app-sre/er-aws-msk-connect",
+        "app-sre/er-aws-rds",
+        "app-sre/er-aws-rds-proxy",
+        "app-sre/er-aws-vpc-endpoint",
+        "app-sre/er-aws-vpc-endpoint-service",
+        "app-sre/er-cloudflare-zone",
+        "app-sre/er-outputs-secrets",
+        "app-sre/gabi",
+        "app-sre/python-project-template"
+      ],
       "pinDigests": true,
       "groupName": "shared-pipelines-pin",
       "groupSlug": "shared-pipelines-pin",
-      "automerge": false
+      "automerge": true
     }
   ],
   "pin": {
